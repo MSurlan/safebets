@@ -9,6 +9,7 @@ options.add_argument("--window-size=1920,1200")
 driver = webdriver.Chrome(options=options)
 driver.get('https://sports.tipico.com/de/alle/1101/680910,31201,1201,680810/virtual_europaLeagueMatches,34301,37886301,37885301,33301,17301,72301,84301,virtual_championsLeagueMatches')
 all_links = driver.find_element(By.TAG_NAME, 'div')
+
 quoten = all_links.find_elements(By.CLASS_NAME,'EventOddButton-styles-odd-button')
 teams = all_links.find_elements(By.CLASS_NAME,'EventTeams-styles-team')
 kategorie = all_links.find_elements(By.CLASS_NAME,'EventOddGroup-styles-fixed-param-text')
