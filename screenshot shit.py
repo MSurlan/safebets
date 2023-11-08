@@ -1,6 +1,7 @@
 import pathlib
 
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 import time
 import csv
@@ -32,6 +33,8 @@ driver = webdriver.Chrome(options=options)
 with open('druglinks2.csv', newline="") as csvfiles:
     reader = csv.reader(csvfiles, delimiter=' ', quotechar='|')
     counter = 0
+    counter2 = 0
+    counter3 = 0
     tipico_cookie_clicked = False
     betahome_cookie_clicked = False
     for row in reader:
@@ -39,8 +42,10 @@ with open('druglinks2.csv', newline="") as csvfiles:
         print(url)
         driver.get(url)
         time.sleep(2)
+        # div = driver.find_element(By.TAG_NAME, 'div') #EventOddButton-styles-odd-button //*[@id="app"]/main/main/section/div/div[1]/div[3]/div/div/div[2]/div[1]/div/div/div/div[4]
+        #//*[@id="app"]/main/main/section/div/div[1]/div[3]/div/div/div[2]/div[1]/div/div/div/div[5]
         div = driver.find_element(By.TAG_NAME, 'div')
-        element = div.find_elements(By.CLASS_NAME,"EventOddButton-styles-odd-button") ## new div of all the div games i guess?
+        quoten = div.find_elements(By.CLASS_NAME, 'EventOddButton-styles-odd-button')
 
         if "tipico" in url and tipico_cookie_clicked == False :
             driver.execute_script('''return document.querySelector("#_evidon_banner").querySelector("button[id='_evidon-accept-button']")''').click()  # tipico
@@ -49,21 +54,42 @@ with open('druglinks2.csv', newline="") as csvfiles:
             driver.execute_script('''return document.querySelector("#AppContainer").querySelector("button[class='CloseFirstAccessButton']")''').click()  # betathome
             betathome_cookie_clicked = True
         counter+=1
+        counter2+=1
+        counter3+=1
+
         imgpath = f"images/image{counter}.png"
         driver.save_screenshot(imgpath)
-        for elements in element:
-            location = elements.location
-            size = elements.size
+        for q in quoten:
+            location = q.location
+            size = q.size
             x = location['x']
             y = location['y']
             width = location['x'] + size['width']
             height = location['y'] + size['height']
-
             im = Image.open(imgpath)
             im = im.crop((int(x), int(y), int(width), int(height)))
-            imgpath2 = f"images/tipico/image{counter}.png"
-            counter+=1
-            im.save(imgpath2)
+            imgpath3 = f"images/traindata/image{counter3}.png"
+            counter3 += 1
+            im.save(imgpath3)
+        for i in range(1,40):
+            try:
+                element = driver.find_element(By.XPATH,f"//*[@id='app']/main/main/section/div/div[1]/div[3]/div/div/div[2]/div[1]/div/div/div/div[{i}]")  ## new div of all the div games i guess? EventRow-styles-event-row
+                location = element.location
+                size = element.size
+                x = location['x']
+                y = location['y']
+                width = location['x'] + size['width']
+                height = location['y'] + size['height']
+                im = Image.open(imgpath)
+                im = im.crop((int(x), int(y), int(width), int(height)))
+                imgpath2 = f"images/tipico/image{counter2}.png"
+                counter2 += 1
+                im.save(imgpath2)
+                # Do something with the element
+            except NoSuchElementException:
+                # Handle the case where the element is not found
+                pass
+
         # Program-styles-program Program-styles-desktop
 
         # img2 = Image.open(imgpath)
