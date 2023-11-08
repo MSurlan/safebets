@@ -7,6 +7,8 @@ import csv
 import numpy as np
 import os
 import PIL
+from selenium.webdriver.common.by import By
+from PIL import Image
 import PIL.Image
 import tensorflow as tf
 import tensorflow_datasets as tfds
@@ -37,15 +39,42 @@ with open('druglinks2.csv', newline="") as csvfiles:
         print(url)
         driver.get(url)
         time.sleep(2)
+        div = driver.find_element(By.TAG_NAME, 'div')
+        element = div.find_elements(By.CLASS_NAME,"EventOddButton-styles-odd-button") ## new div of all the div games i guess?
+
         if "tipico" in url and tipico_cookie_clicked == False :
             driver.execute_script('''return document.querySelector("#_evidon_banner").querySelector("button[id='_evidon-accept-button']")''').click()  # tipico
             tipico_cookie_clicked = True
-        if "bet-at-home" in url and betahome_cookie_clicked == False:
+        if "bet-at-home" in url and betathome_cookie_clicked == False:
             driver.execute_script('''return document.querySelector("#AppContainer").querySelector("button[class='CloseFirstAccessButton']")''').click()  # betathome
-            betahome_cookie_clicked = True
+            betathome_cookie_clicked = True
         counter+=1
-        imgpath = "images/image{}.png".format(counter)
+        imgpath = f"images/image{counter}.png"
         driver.save_screenshot(imgpath)
+        for elements in element:
+            location = elements.location
+            size = elements.size
+            x = location['x']
+            y = location['y']
+            width = location['x'] + size['width']
+            height = location['y'] + size['height']
+
+            im = Image.open(imgpath)
+            im = im.crop((int(x), int(y), int(width), int(height)))
+            imgpath2 = f"images/tipico/image{counter}.png"
+            counter+=1
+            im.save(imgpath2)
+        # Program-styles-program Program-styles-desktop
+
+        # img2 = Image.open(imgpath)
+        # width, height = img2.size
+        # left = 300
+        # top = height / 2
+        # right = 2000
+        # bottom = height
+        # img2 = img2.crop((left, top, right, bottom))
+        # img2.save("images/tipico/test2.png")
+
 ##########################################################################################################################################################
 # data_dir = pathlib.Path(r"images/").with_suffix('')
 # image_count = len(list(data_dir.glob('*/*.png')))
