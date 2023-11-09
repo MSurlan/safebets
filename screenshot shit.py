@@ -36,7 +36,7 @@ with open('druglinks2.csv', newline="") as csvfiles:
     counter2 = 0
     counter3 = 0
     tipico_cookie_clicked = False
-    betahome_cookie_clicked = False
+    betathome_cookie_clicked = False
     for row in reader:
         url = str(row[0])
         print(url)
