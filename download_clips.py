@@ -13,6 +13,7 @@ class ClipInfo():
     def __init__(self):
         self.broadcast_id = None
         self.thumbnailURL = None
+        self.videoID = None
     def getBroadcasterId(self):
         try:
             response = requests.get("https://api.twitch.tv/helix/users?login=Papaplatte",
@@ -36,13 +37,14 @@ class ClipInfo():
             raise SystemExit(err)
         print(response.content)
         self.thumbnailURL = response.json()['data'][0]['thumbnail_url']
+        self.videoID = response.json()['data'][0]['video_id']
         print(self.thumbnailURL)
     def downloadClipFromUrl(self):
         res = self.thumbnailURL.split('preview')[0]
         res = res.rstrip(res[-1])
         res = res + ".mp4"
         r = requests.get(res, stream= True)
-        open(f"videos/video{self.broadcast_id}.mp4", "wb").write(r.content)
+        open(f"videos/video{self.videoID}.mp4", "wb").write(r.content)
 fun = ClipInfo()
 fun.getBroadcasterId()
 fun.getClipInfo()
